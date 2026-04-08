@@ -41,7 +41,7 @@ def load_model():
     model = StrawberryCNN(num_classes=3)
   
     possible_paths = [
-    r"C:\Users\beto2\OneDrive\Desktop\experiments\baseline\best_model.pth",
+    "experiments\baseline\best_model.pth",
 ]
     
     for path in possible_paths:
