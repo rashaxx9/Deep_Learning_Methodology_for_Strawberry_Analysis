@@ -63,7 +63,7 @@ transform = transforms.Compose([
 
 
 
-class_names = ["Overripe", "Ripe", "Unripe"]
+class_names = ["Unripe", "Ripe", "Overripe"]
 class_emojis = ["🔴", "🍓", "🟢"]
 class_colors = ["#856404", "#155724", "#721c24"]
 class_bgs = ["#fff3cd", "#d4edda", "#f8d7da"]
