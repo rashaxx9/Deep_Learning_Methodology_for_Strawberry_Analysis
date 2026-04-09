@@ -5,9 +5,7 @@ from torchvision import transforms
 from PIL import Image
 import os
 
-# ============================================
-# MODEL DEFINITION (YOUR ORIGINAL)
-# ============================================
+
 class StrawberryCNN(nn.Module):
     def __init__(self, num_classes=3):
         super(StrawberryCNN, self).__init__()
@@ -39,14 +37,12 @@ class StrawberryCNN(nn.Module):
         return x
 
 
-# ============================================
-# LOAD MODEL
-# ============================================
+
 @st.cache_resource
 def load_model():
     model = StrawberryCNN(num_classes=3)
     
-    # Try multiple paths
+
     possible_paths = [
         "experiments/baseline/best_model.pth",
         "best_model.pth",
@@ -62,9 +58,7 @@ def load_model():
     return None, None
 
 
-# ============================================
-# IMAGE PREPROCESSING
-# ============================================
+
 transform = transforms.Compose([
     transforms.Resize((128, 128)),
     transforms.ToTensor(),
@@ -72,9 +66,7 @@ transform = transforms.Compose([
 ])
 
 
-# ============================================
-# CLASS NAMES (YOUR ORDER)
-# ============================================
+
 class_names = ["Overripe", "Ripe", "Unripe"]
 class_emojis = ["🔴", "🍓", "🟢"]
 class_colors = ["#856404", "#155724", "#721c24"]
@@ -86,9 +78,7 @@ class_messages = [
 ]
 
 
-# ============================================
-# STREAMLIT UI
-# ============================================
+
 st.set_page_config(
     page_title="Strawberry Ripeness Classifier 🍓",
     page_icon="🍓",
@@ -200,7 +190,7 @@ st.caption("🍓 Made with love for strawberries 🍓")
 st.caption("⚠️ For educational purposes only")
         
        
-        st.caption("🤖 AI Model: Mock Predictions (PyTorch model will be added when Streamlit Cloud supports Python 3.14)")
+st.caption("🤖 AI Model: Mock Predictions (PyTorch model will be added when Streamlit Cloud supports Python 3.14)")
 
 st.divider()
 st.caption("🍓 Made with love for strawberries 🍓")
