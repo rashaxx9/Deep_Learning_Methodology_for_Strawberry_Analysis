@@ -5,7 +5,6 @@ from torchvision import transforms
 from PIL import Image
 import os
 
-
 class StrawberryCNN(nn.Module):
     def __init__(self, num_classes=3):
         super(StrawberryCNN, self).__init__()
@@ -30,7 +29,6 @@ class StrawberryCNN(nn.Module):
             nn.ReLU(),
             nn.Linear(128, num_classes)
         )
-
     def forward(self, x):
         x = self.features(x)
         x = self.classifier(x)
@@ -41,20 +39,18 @@ class StrawberryCNN(nn.Module):
 @st.cache_resource
 def load_model():
     model = StrawberryCNN(num_classes=3)
-    
-
+  
     possible_paths = [
-        "experiments/baseline/best_model.pth",
-        "best_model.pth",
-    ]
-    
+   
+    "experiments/baseline/best_model.pth",
+]
     for path in possible_paths:
         if os.path.exists(path):
             model.load_state_dict(torch.load(path, map_location="cpu"))
             model.eval()
             return model, path
     
-    st.error("No model found! Using mock predictions.")
+    st.error("No model found! Please train a model first.")
     return None, None
 
 
@@ -84,6 +80,7 @@ st.set_page_config(
     page_icon="🍓",
     layout="centered"
 )
+
 
 st.markdown("""
 <style>
@@ -120,10 +117,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 st.markdown('<p class="main-title">🍓 Strawberry Ripeness Classifier 🍓</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitle">Upload a strawberry photo and I\'ll tell you if it\'s ready to eat!</p>', unsafe_allow_html=True)
 
 st.divider()
+
 
 uploaded_file = st.file_uploader(
     "Choose a strawberry image...",
@@ -132,65 +131,57 @@ uploaded_file = st.file_uploader(
 )
 
 if uploaded_file is not None:
+   
     image = Image.open(uploaded_file)
     st.image(image, caption="Your Strawberry 🍓", width=300)
-    
+ 
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         analyze_button = st.button("🔍 Analyze Strawberry", type="primary", use_container_width=True)
     
     if analyze_button:
         with st.spinner("🍓 Analyzing your strawberry... 🍓"):
+           
             input_tensor = transform(image).unsqueeze(0)
-            model, model_path = load_model()
             
+            
+            model, model_path = load_model()
             if model is not None:
                 with torch.no_grad():
                     outputs = model(input_tensor)
                     probabilities = torch.softmax(outputs, dim=1)
                     predicted_class = torch.argmax(probabilities, dim=1).item()
                     confidence = probabilities[0][predicted_class].item() * 100
-                model_source = f"🤖 Model loaded from: {model_path}"
-            else:
-                # Fallback to mock predictions if no model
-                import random
-                predicted_class = random.randint(0, 2)
-                confidence = random.uniform(60, 95)
-                model_source = "⚠️ Using mock predictions (model not found)"
         
-        st.divider()
-        
-        emoji = class_emojis[predicted_class]
-        result_text = class_names[predicted_class].upper()
-        
-        st.markdown(f"""
-        <div class="result-box" style="background-color: {class_bgs[predicted_class]};">
-            <h1 style="font-size: 4rem;">{emoji}</h1>
-            <h2 style="color: {class_colors[predicted_class]};">{result_text}</h2>
-            <p style="font-size: 1.2rem;">{class_messages[predicted_class]}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.write(f"**Confidence:** {confidence:.1f}%")
-        st.progress(confidence / 100)
-        
-        with st.expander("📊 See detailed analysis"):
-            if model is not None:
+        if model is not None:
+            st.divider()
+            
+         
+            emoji = class_emojis[predicted_class]
+            result_text = class_names[predicted_class].upper()
+            
+            st.markdown(f"""
+            <div class="result-box" style="background-color: {class_bgs[predicted_class]};">
+                <h1 style="font-size: 4rem;">{emoji}</h1>
+                <h2 style="color: {class_colors[predicted_class]};">{result_text}</h2>
+                <p style="font-size: 1.2rem;">{class_messages[predicted_class]}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            
+            st.write(f"**Confidence:** {confidence:.1f}%")
+            st.progress(confidence / 100)
+            
+            
+            with st.expander("📊 See detailed analysis"):
                 for i, name in enumerate(class_names):
                     prob = probabilities[0][i].item() * 100
                     st.write(f"{class_emojis[i]} {name}: {prob:.1f}%")
                     st.progress(prob / 100)
-            else:
-                st.write("Detailed analysis unavailable - model not loaded")
-        
-        st.caption(model_source)
-
-st.divider()
-st.caption("🍓 Made with love for strawberries 🍓")
-st.caption("⚠️ For educational purposes only")
-        
-       
-st.caption("🤖 AI Model: Mock Predictions (PyTorch model will be added when Streamlit Cloud supports Python 3.14)")
+            
+            st.caption(f"🤖 Model loaded from: {model_path}")
+        else:
+            st.error("No trained model found. Please train a model first!")
 
 st.divider()
 st.caption("🍓 Made with love for strawberries 🍓")
